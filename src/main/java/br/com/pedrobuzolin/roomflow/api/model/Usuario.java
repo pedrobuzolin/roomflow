@@ -4,9 +4,6 @@ import br.com.pedrobuzolin.roomflow.api.dto.AtualizacaoUsuarioDto;
 import br.com.pedrobuzolin.roomflow.api.dto.CadastroUsuarioDto;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name="usuarios")
 public class Usuario {

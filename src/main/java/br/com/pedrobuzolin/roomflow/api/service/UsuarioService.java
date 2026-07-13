@@ -6,7 +6,9 @@ import br.com.pedrobuzolin.roomflow.api.exception.ValidacaoException;
 import br.com.pedrobuzolin.roomflow.api.model.Usuario;
 import br.com.pedrobuzolin.roomflow.api.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UsuarioService {
     @Autowired
     private UsuarioRepository repository;
