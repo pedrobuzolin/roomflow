@@ -1,6 +1,6 @@
 package br.com.pedrobuzolin.roomflow.api.model;
 
-import br.com.pedrobuzolin.roomflow.api.dto.CadastroSalaDto;
+import br.com.pedrobuzolin.roomflow.api.exception.ValidacaoException;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,15 +11,17 @@ public class Sala {
     private Long id;
     private String nome;
     private Integer capacidade;
-    @Enumerated(EnumType.STRING)
-    private StatusSala status;
+    private boolean ativa;
 
     public Sala() {}
 
-    public Sala(CadastroSalaDto dto) {
-        this.nome = dto.nome();
-        this.capacidade = dto.capacidade();
-        this.status = StatusSala.LIVRE;
+    public Sala(String nome, Integer capacidade) {
+        validarNome(nome);
+        validarCapacidade(capacidade);
+
+        this.nome = nome;
+        this.capacidade = capacidade;
+        this.ativa = true;
     }
 
     public Long getId() {
@@ -34,15 +36,35 @@ public class Sala {
         return capacidade;
     }
 
-    public StatusSala getStatus() {
-        return status;
+    public boolean isAtiva() {
+        return ativa;
     }
 
-    public void marcarComoReservada() {
-        this.status = StatusSala.RESERVADA;
+    public void atualizarDados(String nome, Integer capacidade) {
+        validarNome(nome);
+        validarCapacidade(capacidade);
+
+        this.nome = nome;
+        this.capacidade = capacidade;
     }
 
-    public void marcarComoLivre() {
-        this.status = StatusSala.LIVRE;
+    public void ativarSala() {
+        this.ativa = true;
+    }
+
+    public void desativarSala() {
+        this.ativa = false;
+    }
+
+    private void validarNome(String nome) {
+        if (nome == null || nome.isBlank()) {
+            throw new ValidacaoException("Nome da sala obrigatório!");
+        }
+    }
+
+    private void validarCapacidade(Integer capacidade) {
+        if (capacidade == null || capacidade <= 0) {
+            throw new ValidacaoException("A capacidade deve ser positiva!");
+        }
     }
 }
