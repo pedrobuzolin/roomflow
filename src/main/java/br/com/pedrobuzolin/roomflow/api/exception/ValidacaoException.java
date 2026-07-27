@@ -1,7 +1,7 @@
 package br.com.pedrobuzolin.roomflow.api.exception;
 
-public class ValidacaoException extends RuntimeException {
+public class ValidacaoException extends ApiException {
     public ValidacaoException(String message) {
-        super(message);
+        super(message, TipoErro.VALIDACAO);
     }
 }
