@@ -2,39 +2,50 @@ package br.com.pedrobuzolin.roomflow.api.controller;
 
 import br.com.pedrobuzolin.roomflow.api.dto.AtualizacaoUsuarioDto;
 import br.com.pedrobuzolin.roomflow.api.dto.CadastroUsuarioDto;
-import br.com.pedrobuzolin.roomflow.api.exception.ValidacaoException;
+import br.com.pedrobuzolin.roomflow.api.dto.UsuarioDto;
 import br.com.pedrobuzolin.roomflow.api.service.UsuarioService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
 
 @RestController
-@RequestMapping("/usuario")
+@RequestMapping("/api/v1/usuarios")
 public class UsuarioController {
     @Autowired
     private UsuarioService service;
 
-    @PostMapping
-    @Transactional
-    public ResponseEntity<String> cadastrarUsuario(@RequestBody @Valid CadastroUsuarioDto dto) {
-        try {
-            service.cadastrar(dto);
-            return ResponseEntity.ok().build();
-        } catch (ValidacaoException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+    @GetMapping
+    public ResponseEntity<List<UsuarioDto>> listarTodosUsuarios() {
+        List<UsuarioDto> usuarios = service.buscarTodosUsuarios();
+        return ResponseEntity.ok().body(usuarios);
     }
 
-    @PutMapping
-    @Transactional
-    public ResponseEntity<String> atualizarUsuario(@RequestBody @Valid AtualizacaoUsuarioDto dto) {
-        try {
-            service.atualizar(dto);
-            return ResponseEntity.ok().build();
-        } catch (ValidacaoException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioDto> buscarUsuarioPorId(@PathVariable Long id) {
+        return ResponseEntity.ok().body(service.buscarUsuarioPorId(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> cadastrarUsuario(@RequestBody @Valid CadastroUsuarioDto dto, UriComponentsBuilder uriBuilder) {
+        Long id = service.cadastrar(dto);
+        URI location = uriBuilder.path("/api/v1/usuarios/{id}").buildAndExpand(id).toUri();
+        return ResponseEntity.created(location).build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizarUsuario(@PathVariable Long id, @RequestBody @Valid AtualizacaoUsuarioDto dto) {
+        service.atualizar(id, dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
+        service.deletar(id);
+        return ResponseEntity.noContent().build();
     }
 }
