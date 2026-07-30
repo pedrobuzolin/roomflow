@@ -16,7 +16,7 @@ public class Usuario {
     private boolean ativo;
 
     private static final Pattern EMAIL_PATTERN =
-            Pattern.compile("^[\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,}$");
+            Pattern.compile("^[\\w.+-]+@[\\w-]+(\\.[\\w-]+)*\\.[a-zA-Z]{2,}$");
 
 
     public Usuario() {}
