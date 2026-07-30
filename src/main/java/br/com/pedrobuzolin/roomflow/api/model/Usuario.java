@@ -13,6 +13,7 @@ public class Usuario {
     private Long id;
     private String nome;
     private String email;
+    private boolean ativo;
 
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,}$");
@@ -26,6 +27,7 @@ public class Usuario {
 
         this.nome = nome;
         this.email = email;
+        this.ativo = true;
     }
 
     public Long getId() {
@@ -40,12 +42,22 @@ public class Usuario {
         return email;
     }
 
+    public boolean isAtivo() {
+        return ativo;
+    }
+
     public void atualizarDados(String nome, String email) {
         validarNome(nome);
         validarEmail(email);
 
         this.nome = nome;
         this.email = email;
+    }
+
+    public void anonimizar() {
+        this.nome = "Usuario Removido";
+        this.email = "usuario" + this.id + "@email.local";
+        this.ativo = false;
     }
 
     private void validarNome(String nome) {

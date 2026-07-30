@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -21,16 +22,14 @@ public class UsuarioService {
     private UsuarioRepository repository;
 
     public List<UsuarioDto> buscarTodosUsuarios() {
-        return repository.findAll(Sort.by(Sort.Direction.ASC, "nome"))
+        return repository.findAllByAtivoTrue(Sort.by(Sort.Direction.ASC, "nome"))
                 .stream()
                 .map(UsuarioDto::new)
                 .toList();
     }
 
     public UsuarioDto buscarUsuarioPorId(Long id) {
-        return repository.findById(id)
-                .map(UsuarioDto::new)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não Encontrado!"));
+        return new UsuarioDto(buscarUsuarioAtivoPorId(id));
     }
 
     public Long cadastrar(CadastroUsuarioDto dto) {
@@ -45,12 +44,17 @@ public class UsuarioService {
     }
 
     public void atualizar(Long id, AtualizacaoUsuarioDto dto) {
-        Usuario usuario = repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado!"));
+        Usuario usuario = buscarUsuarioAtivoPorId(id);
         usuario.atualizarDados(dto.nome(), dto.email());
     }
 
     public void deletar(Long id) {
-        repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado!"));
-        repository.deleteById(id);
+        Usuario usuario = buscarUsuarioAtivoPorId(id);
+        usuario.anonimizar();
+    }
+
+    private Usuario buscarUsuarioAtivoPorId(Long id) {
+        return repository.findByIdAndAtivoTrue(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado!"));
     }
 }
