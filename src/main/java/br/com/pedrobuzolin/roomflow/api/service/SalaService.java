@@ -11,7 +11,6 @@ import br.com.pedrobuzolin.roomflow.api.model.StatusReserva;
 import br.com.pedrobuzolin.roomflow.api.repository.ReservaRepository;
 import br.com.pedrobuzolin.roomflow.api.repository.SalaRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,11 +21,13 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class SalaService {
-    @Autowired
-    private SalaRepository salaRepository;
+    private final SalaRepository salaRepository;
+    private final ReservaRepository reservaRepository;
 
-    @Autowired
-    private ReservaRepository reservaRepository;
+    public SalaService(SalaRepository salaRepository, ReservaRepository reservaRepository) {
+        this.salaRepository = salaRepository;
+        this.reservaRepository = reservaRepository;
+    }
 
     public List<SalaDto> buscarSalasAtivas() {
         return salaRepository.findAllByAtivaTrue()

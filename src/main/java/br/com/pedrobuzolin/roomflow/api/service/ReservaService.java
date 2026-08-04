@@ -13,7 +13,6 @@ import br.com.pedrobuzolin.roomflow.api.repository.SalaRepository;
 import br.com.pedrobuzolin.roomflow.api.repository.UsuarioRepository;
 import br.com.pedrobuzolin.roomflow.api.validacoes.ValidacaoSolicitacaoReserva;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,17 +23,18 @@ import java.util.List;
 @Service
 @Transactional
 public class ReservaService {
-    @Autowired
-    private ReservaRepository repository;
+    private final ReservaRepository repository;
+    private final SalaRepository salaRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final List<ValidacaoSolicitacaoReserva> validacoes;
 
-    @Autowired
-    private SalaRepository salaRepository;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private List<ValidacaoSolicitacaoReserva> validacoes;
+    public ReservaService(ReservaRepository repository, SalaRepository salaRepository,
+                          UsuarioRepository usuarioRepository, List<ValidacaoSolicitacaoReserva> validacoes) {
+        this.repository = repository;
+        this.salaRepository = salaRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.validacoes = validacoes;
+    }
 
     public Long criarReserva(SolicitacaoReservaDto dto) {
         Sala sala = salaRepository.findById(dto.idSala()).orElseThrow(() -> new RecursoNaoEncontradoException("Sala não encontrada"));

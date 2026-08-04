@@ -9,8 +9,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ValidacaoReservasConflitantes implements ValidacaoSolicitacaoReserva {
-    @Autowired
-    private ReservaRepository reservaRepository;
+    private final ReservaRepository reservaRepository;
+
+    public ValidacaoReservasConflitantes(ReservaRepository reservaRepository) {
+        this.reservaRepository = reservaRepository;
+    }
 
     @Override
     public void validar(SolicitacaoReservaDto dto) {

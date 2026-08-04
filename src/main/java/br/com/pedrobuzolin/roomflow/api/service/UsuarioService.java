@@ -8,18 +8,19 @@ import br.com.pedrobuzolin.roomflow.api.exception.ValidacaoException;
 import br.com.pedrobuzolin.roomflow.api.model.Usuario;
 import br.com.pedrobuzolin.roomflow.api.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
 public class UsuarioService {
-    @Autowired
-    private UsuarioRepository repository;
+    private final UsuarioRepository repository;
+
+    public UsuarioService(UsuarioRepository repository) {
+        this.repository = repository;
+    }
 
     public List<UsuarioDto> buscarTodosUsuarios() {
         return repository.findAllByAtivoTrue(Sort.by(Sort.Direction.ASC, "nome"))
