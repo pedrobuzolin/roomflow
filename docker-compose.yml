@@ -1,0 +1,25 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/roomflow
+      SPRING_DATASOURCE_USERNAME: roomflow
+      SPRING_DATASOURCE_PASSWORD: roomflow
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: roomflow
+      POSTGRES_USER: roomflow
+      POSTGRES_PASSWORD: roomflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - roomflow-data:/var/lib/postgresql/data
+
+volumes:
+  roomflow-data:
