@@ -5,6 +5,9 @@ import br.com.pedrobuzolin.roomflow.api.dto.CadastroSalaDto;
 import br.com.pedrobuzolin.roomflow.api.dto.SalaDto;
 import br.com.pedrobuzolin.roomflow.api.service.SalaService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -34,8 +37,9 @@ public class SalaController {
     }
 
     @GetMapping(("/disponiveis"))
-    public ResponseEntity<List<SalaDto>> listarTodasSalasDisponiveis(@RequestParam LocalDateTime dataInicial, @RequestParam LocalDateTime dataFinal) {
-        List<SalaDto> salas = service.buscarSalasDisponiveis(dataInicial, dataFinal);
+    public ResponseEntity<Page<SalaDto>> listarTodasSalasDisponiveis(@RequestParam LocalDateTime dataInicial, @RequestParam LocalDateTime dataFinal,
+                                                                     @PageableDefault(size = 20, sort = "nome")  Pageable pageable) {
+        Page<SalaDto> salas = service.buscarSalasDisponiveis(dataInicial, dataFinal, pageable);
         return ResponseEntity.ok().body(salas);
     }
 

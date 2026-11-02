@@ -9,6 +9,10 @@ import br.com.pedrobuzolin.roomflow.api.service.SalaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -70,7 +74,12 @@ class SalaControllerTest {
 
     @Test
     void deveriaDevolverCodigo200ParaRequisicaoListarTodasSalasDisponiveis() throws Exception {
-        when(service.buscarSalasDisponiveis(any(), any())).thenReturn(List.of());
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<SalaDto> paginaVazia = new PageImpl<>(List.of(), pageable, 0);
+
+        when(service.buscarSalasDisponiveis(
+                any(), any(), any(Pageable.class)
+        )).thenReturn(paginaVazia);
 
         MockHttpServletResponse response = mockMvc.perform(
                 get("/api/v1/salas/disponiveis")
@@ -83,7 +92,11 @@ class SalaControllerTest {
 
     @Test
     void deveriaDevolverCodigo400ParaRequisicaoListarTodasSalasDisponiveisComDatasInvalidas() throws Exception {
-        when(service.buscarSalasDisponiveis(any(), any())).thenThrow(new ValidacaoException("A data inicial deve ser anterior à data final!"));
+        when(service.buscarSalasDisponiveis(
+                any(), any(), any(Pageable.class)
+        )).thenThrow(new ValidacaoException(
+                "A data inicial deve ser anterior à data final!"
+        ));
 
         MockHttpServletResponse response = mockMvc.perform(
                 get("/api/v1/salas/disponiveis")

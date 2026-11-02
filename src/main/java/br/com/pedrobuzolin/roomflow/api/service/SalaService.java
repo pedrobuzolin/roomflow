@@ -5,18 +5,17 @@ import br.com.pedrobuzolin.roomflow.api.dto.CadastroSalaDto;
 import br.com.pedrobuzolin.roomflow.api.dto.SalaDto;
 import br.com.pedrobuzolin.roomflow.api.exception.RecursoNaoEncontradoException;
 import br.com.pedrobuzolin.roomflow.api.exception.ValidacaoException;
-import br.com.pedrobuzolin.roomflow.api.model.Reserva;
 import br.com.pedrobuzolin.roomflow.api.model.Sala;
 import br.com.pedrobuzolin.roomflow.api.model.StatusReserva;
 import br.com.pedrobuzolin.roomflow.api.repository.ReservaRepository;
 import br.com.pedrobuzolin.roomflow.api.repository.SalaRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -36,24 +35,24 @@ public class SalaService {
                 .toList();
     }
 
-    public List<SalaDto> buscarSalasDisponiveis(LocalDateTime dataInicial, LocalDateTime dataFinal) {
-        if (!dataInicial.isBefore(dataFinal)) {
-            throw new ValidacaoException("A data inicial deve ser anterior à data final!");
+    public Page<SalaDto> buscarSalasDisponiveis(
+            LocalDateTime dataInicio,
+            LocalDateTime dataFim,
+            Pageable pageable) {
+
+        if (dataInicio == null || dataFim == null ||
+                !dataInicio.isBefore(dataFim)) {
+            throw new ValidacaoException(
+                    "O período informado é inválido!"
+            );
         }
 
-        List<Reserva> conflitantes = reservaRepository.buscarReservasConflitantes(
-                StatusReserva.ATIVA, dataFinal, dataInicial);
-
-        Set<Long> salasIndisponiveis = conflitantes
-                .stream()
-                .map(reserva -> reserva.getSala().getId())
-                .collect(Collectors.toSet());
-
-        return salaRepository.findAllByAtivaTrue()
-                .stream()
-                .filter(sala -> !salasIndisponiveis.contains(sala.getId()))
-                .map(SalaDto::new)
-                .toList();
+        return salaRepository.buscarSalasDisponiveis(
+                dataInicio,
+                dataFim,
+                StatusReserva.ATIVA,
+                pageable
+        ).map(SalaDto::new);
     }
 
     public SalaDto buscarSalaPorId(Long id) {
