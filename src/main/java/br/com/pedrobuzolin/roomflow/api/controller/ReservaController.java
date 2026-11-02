@@ -18,8 +18,11 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/api/v1/reservas")
 public class ReservaController {
-    @Autowired
-    private ReservaService service;
+    private final ReservaService service;
+
+    public ReservaController(ReservaService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public ResponseEntity<Page<ReservaDto>> listarTodasReservas (@PageableDefault(size = 20, sort = "dataInicio") Pageable pageable) {

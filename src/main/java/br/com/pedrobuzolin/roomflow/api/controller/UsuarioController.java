@@ -16,8 +16,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/usuarios")
 public class UsuarioController {
-    @Autowired
-    private UsuarioService service;
+    private final UsuarioService service;
+
+    public UsuarioController(UsuarioService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public ResponseEntity<List<UsuarioDto>> listarTodosUsuarios() {

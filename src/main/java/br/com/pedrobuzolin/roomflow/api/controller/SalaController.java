@@ -17,8 +17,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/salas")
 public class SalaController {
-    @Autowired
-    private SalaService service;
+    private final SalaService service;
+
+    public SalaController(SalaService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public ResponseEntity<List<SalaDto>> listarTodasSalasAtivas() {
