@@ -9,4 +9,6 @@ public interface SalaRepository extends JpaRepository<Sala, Long> {
     List<Sala> findAllByAtivaTrue();
 
     boolean existsByNome(String nome);
+
+    boolean existsByNomeAndIdNot(String nome, Long id);
 }

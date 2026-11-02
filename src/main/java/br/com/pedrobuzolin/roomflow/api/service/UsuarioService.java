@@ -46,6 +46,12 @@ public class UsuarioService {
 
     public void atualizar(Long id, AtualizacaoUsuarioDto dto) {
         Usuario usuario = buscarUsuarioAtivoPorId(id);
+
+        boolean emailEmUso = repository.existsByEmailAndIdNot(dto.email(), id);
+        if (emailEmUso) {
+            throw new ValidacaoException("Email já cadastrado!");
+        }
+
         usuario.atualizarDados(dto.nome(), dto.email());
     }
 

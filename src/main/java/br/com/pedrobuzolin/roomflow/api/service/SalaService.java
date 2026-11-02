@@ -73,6 +73,10 @@ public class SalaService {
 
     public void atualizarSala(Long id, AtualizacaoSalaDto dto) {
         Sala sala = verificarExistenciaSalaPorId(id);
+        boolean nomeDeSalaEmUso = salaRepository.existsByNomeAndIdNot(dto.nome(), id);
+        if (nomeDeSalaEmUso) {
+            throw new ValidacaoException("Nome de sala já existente!");
+        }
         sala.atualizarDados(dto.nome(), dto.capacidade());
     }
 
