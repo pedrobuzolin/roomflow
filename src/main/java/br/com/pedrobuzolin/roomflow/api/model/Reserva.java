@@ -17,14 +17,20 @@ public class Reserva {
     private Long id;
     @Enumerated(EnumType.STRING)
     private StatusReserva statusReserva;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Usuario usuario;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Sala sala;
     private LocalDateTime dataInicio;
     private LocalDateTime dataFim;
 
     public Reserva (Sala sala, Usuario usuario, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        if (sala == null || usuario == null) {
+            throw new ValidacaoException(
+                    "Sala e usuário são obrigatórios para criar uma reserva!"
+            );
+        }
+
         validarHorarios(dataInicio, dataFim);
 
         this.sala = sala;
@@ -39,12 +45,12 @@ public class Reserva {
             throw new ValidacaoException("Reserva já está cancelada!");
         }
 
-        if (!LocalDateTime.now().isBefore(this.dataInicio)) {
-            throw new ValidacaoException("Não é possível cancelar uma reserva que já começou!");
-        }
-
         if (!LocalDateTime.now().isBefore(this.dataFim)) {
             throw new ValidacaoException("Não é possível cancelar uma reserva que já encerrada!");
+        }
+
+        if (!LocalDateTime.now().isBefore(this.dataInicio)) {
+            throw new ValidacaoException("Não é possível cancelar uma reserva que já começou!");
         }
 
         this.statusReserva = StatusReserva.CANCELADA;
