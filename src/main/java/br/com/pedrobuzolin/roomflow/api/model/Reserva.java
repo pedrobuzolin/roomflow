@@ -57,6 +57,18 @@ public class Reserva {
     }
 
     public void marcarReservaComoCancelada () {
+        if (this.statusReserva == StatusReserva.CANCELADA) {
+            throw new ValidacaoException("Reserva já está cancelada!");
+        }
+
+        if (!LocalDateTime.now().isBefore(this.dataInicio)) {
+            throw new ValidacaoException("Não é possível cancelar uma reserva que já começou!");
+        }
+
+        if (!LocalDateTime.now().isBefore(this.dataFim)) {
+            throw new ValidacaoException("Não é possível cancelar uma reserva que já encerrada!");
+        }
+
         this.statusReserva = StatusReserva.CANCELADA;
     }
 
