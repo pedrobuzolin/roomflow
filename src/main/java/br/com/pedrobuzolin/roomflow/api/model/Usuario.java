@@ -2,11 +2,15 @@ package br.com.pedrobuzolin.roomflow.api.model;
 
 import br.com.pedrobuzolin.roomflow.api.exception.ValidacaoException;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.regex.Pattern;
 
 @Entity
 @Table(name="usuarios")
+@NoArgsConstructor
+@Getter
 public class Usuario {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -18,9 +22,6 @@ public class Usuario {
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[\\w.+-]+@[\\w-]+(\\.[\\w-]+)*\\.[a-zA-Z]{2,}$");
 
-
-    public Usuario() {}
-
     public Usuario(String nome, String email) {
         validarNome(nome);
         validarEmail(email);
@@ -28,22 +29,6 @@ public class Usuario {
         this.nome = nome;
         this.email = email;
         this.ativo = true;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public boolean isAtivo() {
-        return ativo;
     }
 
     public void atualizarDados(String nome, String email) {

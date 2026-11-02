@@ -2,11 +2,15 @@ package br.com.pedrobuzolin.roomflow.api.model;
 
 import br.com.pedrobuzolin.roomflow.api.exception.ValidacaoException;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name="reservas")
+@NoArgsConstructor
+@Getter
 public class Reserva {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,8 +24,6 @@ public class Reserva {
     private LocalDateTime dataInicio;
     private LocalDateTime dataFim;
 
-    public Reserva() {}
-
     public Reserva (Sala sala, Usuario usuario, LocalDateTime dataInicio, LocalDateTime dataFim) {
         validarHorarios(dataInicio, dataFim);
 
@@ -30,30 +32,6 @@ public class Reserva {
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
         this.statusReserva = StatusReserva.ATIVA;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public StatusReserva getStatusReserva() {
-        return statusReserva;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public Sala getSala() {
-        return sala;
-    }
-
-    public LocalDateTime getDataInicio() {
-        return dataInicio;
-    }
-
-    public LocalDateTime getDataFim() {
-        return dataFim;
     }
 
     public void marcarReservaComoCancelada () {

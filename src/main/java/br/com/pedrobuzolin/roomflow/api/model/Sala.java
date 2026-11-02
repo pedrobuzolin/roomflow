@@ -2,9 +2,13 @@ package br.com.pedrobuzolin.roomflow.api.model;
 
 import br.com.pedrobuzolin.roomflow.api.exception.ValidacaoException;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="salas")
+@NoArgsConstructor
+@Getter
 public class Sala {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,8 +17,6 @@ public class Sala {
     private Integer capacidade;
     private boolean ativa;
 
-    public Sala() {}
-
     public Sala(String nome, Integer capacidade) {
         validarNome(nome);
         validarCapacidade(capacidade);
@@ -22,22 +24,6 @@ public class Sala {
         this.nome = nome;
         this.capacidade = capacidade;
         this.ativa = true;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public Integer getCapacidade() {
-        return capacidade;
-    }
-
-    public boolean isAtiva() {
-        return ativa;
     }
 
     public void atualizarDados(String nome, Integer capacidade) {
