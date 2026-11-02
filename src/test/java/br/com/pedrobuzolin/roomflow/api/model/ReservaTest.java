@@ -11,39 +11,61 @@ class ReservaTest {
 
     private final Sala sala = new Sala("Sala Azul", 20);
     private final Usuario usuario = new Usuario("Teste", "teste@email.com");
+    private final LocalDateTime dataInicio = LocalDateTime.now().plusDays(1);
+    private final LocalDateTime dataFim = dataInicio.plusHours(1);
 
     @Test
     void deveriaCriarReservaAtivaComDadosValidos() {
-        Reserva reserva = new Reserva(sala, usuario,
-                LocalDateTime.parse("2026-08-10T10:00:00"),
-                LocalDateTime.parse("2026-08-10T11:00:00"));
+        Reserva reserva = new Reserva(sala, usuario, dataInicio, dataFim);
 
         assertEquals(StatusReserva.ATIVA, reserva.getStatusReserva());
     }
 
     @Test
     void deveriaLancarExcecaoQuandoInicioForDepoisDoFim() {
-        LocalDateTime inicio = LocalDateTime.parse("2026-08-10T12:00:00");
-        LocalDateTime fim = LocalDateTime.parse("2026-08-10T11:00:00");
+        LocalDateTime fim = dataFim.minusHours(2);
 
-        assertThrows(ValidacaoException.class, () -> new Reserva(sala, usuario, inicio, fim));
+        assertThrows(ValidacaoException.class, () -> new Reserva(sala, usuario, dataInicio, fim));
     }
 
     @Test
     void deveriaLancarExcecaoQuandoInicioForIgualAoFim() {
-        LocalDateTime horario = LocalDateTime.parse("2026-08-10T10:00:00");
-
-        assertThrows(ValidacaoException.class, () -> new Reserva(sala, usuario, horario, horario));
+        assertThrows(ValidacaoException.class, () -> new Reserva(sala, usuario, dataInicio, dataInicio));
     }
 
     @Test
-    void deveriaMarcarReservaComoCancelada() {
-        Reserva reserva = new Reserva(sala, usuario,
-                LocalDateTime.parse("2026-08-10T10:00:00"),
-                LocalDateTime.parse("2026-08-10T11:00:00"));
+    void deveriaMarcarReservaComoCanceladaComReservaFutura() {
+        Reserva reserva = new Reserva(sala, usuario, dataInicio, dataFim);
 
         reserva.marcarReservaComoCancelada();
 
         assertEquals(StatusReserva.CANCELADA, reserva.getStatusReserva());
+    }
+
+    @Test
+    void deveriaLancarExececaoQuandoMarcarReservaComoCanceladaComReservaEmAndamento() {
+        Reserva reserva = new Reserva(sala, usuario, dataInicio.minusMinutes(30), dataFim.plusMinutes(30));
+
+        reserva.marcarReservaComoCancelada();
+
+        assertThrows(ValidacaoException.class, reserva::marcarReservaComoCancelada);
+    }
+
+    @Test
+    void deveriaLancarExececaoQuandoMarcarReservaComoCanceladaComReservaJaEncerrada() {
+        Reserva reserva = new Reserva(sala, usuario, dataInicio.minusHours(2), dataFim.minusHours(1));
+
+        reserva.marcarReservaComoCancelada();
+
+        assertThrows(ValidacaoException.class, reserva::marcarReservaComoCancelada);
+    }
+
+    @Test
+    void deveriaLancarExececaoQuandoMarcarReservaComoCanceladaComReservaJaCancelada() {
+        Reserva reserva = new Reserva(sala, usuario, dataInicio, dataFim);
+
+        reserva.marcarReservaComoCancelada();
+
+        assertThrows(ValidacaoException.class, reserva::marcarReservaComoCancelada);
     }
 }
