@@ -1,125 +1,118 @@
 # RoomFlow
 
-API REST para gerenciamento de reservas de salas, desenvolvida como projeto final de curso.
+API REST para gerenciamento de salas e reservas, desenvolvida com **Java e Spring Boot**, utilizando PostgreSQL para persistência dos dados.
 
-O projeto implementa o cadastro e gerenciamento de salas, usuários e reservas, aplicando regras de negócio diretamente na camada de domínio, validação de conflitos de horário, tratamento padronizado de erros e testes automatizados.
+O projeto implementa o gerenciamento de usuários, salas e reservas, com foco em regras de negócio, integridade dos dados, controle de conflitos de horários e organização em camadas.
 
-## ✨ Destaques
+## Destaques técnicos
 
-- Arquitetura em camadas
-- Regras de negócio encapsuladas nas entidades
-- Validações desacopladas utilizando Strategy Pattern
-- Tratamento de erros padronizado com `ProblemDetail` (RFC 9457)
-- Persistência com Spring Data JPA e Hibernate
-- Testes unitários de domínio, services e controllers
-- Docker Compose para execução da aplicação
-- Pipeline de Integração Contínua com GitHub Actions
+- Arquitetura monolítica em camadas.
+- Regras de negócio encapsuladas nas entidades de domínio.
+- Validações desacopladas utilizando Strategy Pattern.
+- Controle de conflitos de reservas com bloqueio pessimista (`PESSIMISTIC_WRITE`).
+- Persistência com Spring Data JPA e Hibernate.
+- Versionamento do banco de dados com Flyway.
+- Validação do schema com Hibernate (`ddl-auto=validate`).
+- Tratamento padronizado de erros com `ProblemDetail` (RFC 9457).
+- Testes automatizados com JUnit 5 e Mockito.
+- Containerização da aplicação e do banco de dados com Docker Compose.
+- Integração contínua com GitHub Actions.
 
----
+## Tecnologias
 
-# Tecnologias
+| Tecnologia | Utilização |
+|---|---|
+| Java 26 | Linguagem |
+| Spring Boot 4.1 | Framework principal |
+| Spring Web MVC | Construção da API REST |
+| Spring Data JPA | Persistência de dados |
+| Hibernate | ORM |
+| Bean Validation | Validação de dados |
+| PostgreSQL 17 | Banco de dados |
+| Flyway | Versionamento de migrations |
+| Maven | Gerenciamento de dependências e build |
+| JUnit 5 | Testes automatizados |
+| Mockito | Simulação de dependências nos testes |
+| Docker | Containerização |
+| Docker Compose | Orquestração dos containers |
+| GitHub Actions | Integração contínua |
 
-- Java 26
-- Spring Boot 4.1
-- Spring Web MVC
-- Spring Data JPA
-- Hibernate
-- Bean Validation
-- PostgreSQL
-- Maven
-- JUnit 5
-- Mockito
-- Docker
-- Docker Compose
-- GitHub Actions
+## Funcionalidades
 
----
+### Salas
+- Cadastro e atualização de salas.
+- Ativação e desativação.
+- Consulta de disponibilidade por período.
+- Preservação do histórico de reservas, sem exclusão física.
 
-# Funcionalidades
+### Usuários
+- Cadastro e atualização.
+- Consulta de usuários.
+- Anonimização de dados na remoção.
+- Preservação do histórico de reservas.
 
-## Salas
+### Reservas
+- Solicitação e cancelamento de reservas.
+- Consulta de reservas por sala e período.
+- Listagem paginada.
+- Consulta de reservas ativas.
+- Validação de conflitos de horários.
 
-- Cadastro de salas
-- Atualização de informações
-- Ativação e desativação de salas
-- Consulta de disponibilidade por período
-- Preservação do histórico de reservas (não existe exclusão física)
+## Regras de negócio
 
-## Usuários
+O sistema aplica regras para preservar a consistência das operações:
 
-- Cadastro
-- Atualização
-- Remoção por anonimização
-- Preservação do histórico de reservas para auditoria
-
-## Reservas
-
-- Solicitação de reserva
-- Cancelamento de reserva
-- Paginação das consultas
-- Consulta por sala
-- Consulta por período
-
----
-
-# Regras de Negócio
-
-A API aplica diversas regras diretamente na camada de domínio.
-
-- Não é permitido reservar uma sala desativada.
-- Não é permitido realizar reservas para usuários inativos.
+- Salas desativadas não podem receber novas reservas.
+- Usuários inativos não podem realizar reservas.
 - A data de início deve ser anterior à data de término.
-- Reservas utilizam **intervalo semiaberto**, permitindo que uma reserva termine exatamente quando outra começa sem gerar conflito.
-- Horários conflitantes são rejeitados.
-- Salas não são removidas fisicamente, preservando todo o histórico de reservas.
-- Usuários removidos têm seus dados anonimizados, mantendo a integridade histórica das reservas.
+- Reservas com horários conflitantes são rejeitadas.
+- Os intervalos são semiabertos: uma reserva pode terminar exatamente no horário em que outra começa.
+- A criação de reservas utiliza bloqueio pessimista da sala para controlar operações concorrentes.
+- Salas não são excluídas fisicamente.
+- Usuários removidos têm seus dados anonimizados, preservando o histórico relacionado às reservas.
 
----
+## Arquitetura
 
-# Arquitetura
+O projeto utiliza arquitetura em camadas, separando responsabilidades:
 
-```
+```text
 controller/
-│
-├── recebe requisições HTTP
-├── valida DTOs
-└── delega para os services
+    Recebe requisições HTTP,
+    valida DTOs e delega aos serviços.
 
 service/
-│
-├── orquestra casos de uso
-└── coordena regras de negócio
+    Orquestra os casos de uso
+    e coordena as operações.
 
 model/
-│
-├── entidades JPA
-└── invariantes do domínio
+    Contém as entidades JPA
+    e regras de negócio do domínio.
 
 repository/
-│
-└── acesso aos dados com Spring Data JPA
+    Responsável pelo acesso
+    e persistência dos dados.
 
 dto/
-│
-└── contratos de entrada e saída da API
+    Define os contratos de entrada
+    e saída da API.
 
 validacoes/
-│
-└── estratégias de validação das reservas
+    Contém estratégias de validação
+    das reservas.
 
 exception/
-│
-└── exceções de negócio e tratamento centralizado
+    Contém exceções de negócio
+    e tratamento centralizado de erros.
 ```
 
----
+## Endpoints
 
-# Endpoints
+Base URL: `http://localhost:8080`
 
-## Salas
+### Salas
 
 | Método | Endpoint | Descrição |
-|---------|----------|-----------|
+|---|---|---|
 | GET | `/api/v1/salas` | Lista salas ativas |
 | GET | `/api/v1/salas/{id}` | Busca sala por ID |
 | GET | `/api/v1/salas/disponiveis` | Consulta disponibilidade por período |
@@ -128,130 +121,128 @@ exception/
 | PATCH | `/api/v1/salas/ativar/{id}` | Ativa sala |
 | PATCH | `/api/v1/salas/desativar/{id}` | Desativa sala |
 
-## Usuários
+### Usuários
 
 | Método | Endpoint | Descrição |
-|---------|----------|-----------|
+|---|---|---|
 | GET | `/api/v1/usuarios` | Lista usuários ativos |
 | GET | `/api/v1/usuarios/{id}` | Busca usuário por ID |
 | POST | `/api/v1/usuarios` | Cadastra usuário |
 | PUT | `/api/v1/usuarios/{id}` | Atualiza usuário |
 | DELETE | `/api/v1/usuarios/{id}` | Anonimiza usuário |
 
-## Reservas
+### Reservas
 
 | Método | Endpoint | Descrição |
-|---------|----------|-----------|
-| GET | `/api/v1/reservas` | Lista reservas (paginado) |
+|---|---|---|
+| GET | `/api/v1/reservas` | Lista reservas paginadas |
 | GET | `/api/v1/reservas/ativas` | Lista reservas ativas |
 | GET | `/api/v1/reservas/{id}` | Busca reserva por ID |
-| GET | `/api/v1/reservas/sala?idSala=` | Lista reservas de uma sala |
+| GET | `/api/v1/reservas/sala?idSala={id}` | Lista reservas de uma sala |
 | GET | `/api/v1/reservas/periodo` | Consulta reservas por período |
 | POST | `/api/v1/reservas` | Solicita reserva |
 | PATCH | `/api/v1/reservas/cancelar/{id}` | Cancela reserva |
 
----
+## Como executar
 
-# Como executar
+### Pré-requisitos
 
-## Utilizando Docker Compose (recomendado)
+- Java 26
+- Maven
+- Docker e Docker Compose
 
-```bash
+### Utilizando Docker Compose
+
+O projeto utiliza variáveis de ambiente para configurar as credenciais do PostgreSQL.
+
+No PowerShell, configure:
+
+```powershell
+$env:DB_USER="roomflow"
+$env:DB_PASSWORD="sua_senha"
+```
+
+Como o Dockerfile utiliza um JAR previamente compilado, execute o build antes de iniciar os containers:
+
+```powershell
+.\mvnw.cmd clean package -DskipTests
+```
+
+Em seguida, inicie a aplicação:
+
+```powershell
 docker compose up --build
 ```
 
 A aplicação ficará disponível em:
 
-```
-http://localhost:8080
-```
+`http://localhost:8080`
 
-O comando inicia automaticamente:
+O PostgreSQL ficará disponível na porta `5432`.
 
-- API RoomFlow
-- Banco PostgreSQL
+O Docker Compose inicia os seguintes serviços:
 
----
+- **app:** aplicação Spring Boot.
+- **db:** banco de dados PostgreSQL.
 
-## Executando localmente
+O banco utiliza um volume persistente para preservar os dados entre reinicializações dos containers.
 
-Pré-requisitos:
+Para encerrar os serviços:
 
-- Java 26
-- Maven
-- PostgreSQL
-
-Configure as variáveis de ambiente necessárias e execute:
-
-```bash
-mvn spring-boot:run
+```powershell
+docker compose down
 ```
 
----
+### Executando localmente
 
-# Executando os testes
+É necessário possuir uma instância PostgreSQL em execução e configurar as seguintes variáveis de ambiente:
 
-```bash
-mvn test
+```powershell
+$env:DB_HOST="localhost:5432"
+$env:DB_NAME="roomflow"
+$env:DB_USER="roomflow"
+$env:DB_PASSWORD="sua_senha"
 ```
 
-A suíte de testes cobre:
+Execute a aplicação com:
 
-- Entidades de domínio
-- Regras de validação
-- Services
-- Controllers (`@WebMvcTest`)
-
-Utilizando:
-
-- JUnit 5
-- Mockito
-
----
-
-# Estrutura do Projeto
-
-```
-src
-└── main
-    └── java
-        └── br.com.pedrobuzolin.roomflow
-            ├── controller
-            ├── dto
-            ├── exception
-            ├── model
-            ├── repository
-            ├── service
-            └── validacoes
+```powershell
+.\mvnw.cmd spring-boot:run
 ```
 
----
+As migrations do banco são gerenciadas pelo Flyway durante a inicialização da aplicação.
 
-# Próximas melhorias
+## Testes automatizados
 
-- Testes de integração utilizando `@DataJpaTest`
-- Documentação automática da API com OpenAPI/Swagger
-- Autenticação e autorização com Spring Security
-- Cache para consultas de disponibilidade
-- Observabilidade (logs estruturados e métricas)
+Para executar os testes:
 
----
+```powershell
+.\mvnw.cmd test
+```
 
-# Objetivos do projeto
+O projeto utiliza:
 
-Este projeto foi desenvolvido com foco em aplicar boas práticas de desenvolvimento backend utilizando Spring Boot, incluindo:
+- **JUnit 5:** estruturação e execução dos testes.
+- **Mockito:** simulação de dependências.
+- **Spring Boot Test:** suporte aos testes da aplicação.
 
-- Modelagem orientada a domínio
-- Separação de responsabilidades
-- Encapsulamento das regras de negócio
-- Tratamento consistente de exceções
-- Testes automatizados
-- Persistência com JPA/Hibernate
-- Boas práticas na construção de APIs REST
-- Integração contínua com GitHub Actions
+A cobertura atual contempla testes unitários de domínio, regras de validação, serviços e controllers.
 
----
+## Escopo atual
 
-# Licença
+Esta versão utiliza arquitetura monolítica e não implementa autenticação e autorização de usuários.
 
-Este projeto foi desenvolvido para fins de estudo e portfólio.
+A aplicação foi desenvolvida para fins de estudo e portfólio, com foco na construção de APIs REST, modelagem de domínio, persistência relacional e aplicação de regras de negócio.
+
+## Objetivos de desenvolvimento
+
+O RoomFlow foi desenvolvido para consolidar conhecimentos em:
+
+- Desenvolvimento backend com Java e Spring Boot.
+- Construção e organização de APIs REST.
+- Modelagem de entidades e relacionamentos JPA.
+- Encapsulamento de regras de negócio.
+- Controle de transações e concorrência.
+- Integridade e versionamento de banco de dados.
+- Testes automatizados.
+- Containerização e integração contínua.
