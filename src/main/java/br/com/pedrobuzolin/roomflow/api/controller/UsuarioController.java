@@ -5,7 +5,6 @@ import br.com.pedrobuzolin.roomflow.api.dto.CadastroUsuarioDto;
 import br.com.pedrobuzolin.roomflow.api.dto.UsuarioDto;
 import br.com.pedrobuzolin.roomflow.api.service.UsuarioService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;

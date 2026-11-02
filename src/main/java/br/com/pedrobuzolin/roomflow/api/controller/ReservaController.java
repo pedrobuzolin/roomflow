@@ -4,7 +4,6 @@ import br.com.pedrobuzolin.roomflow.api.dto.ReservaDto;
 import br.com.pedrobuzolin.roomflow.api.dto.SolicitacaoReservaDto;
 import br.com.pedrobuzolin.roomflow.api.service.ReservaService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
