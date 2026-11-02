@@ -37,7 +37,7 @@ public class ReservaService {
     }
 
     public Long criarReserva(SolicitacaoReservaDto dto) {
-        Sala sala = salaRepository.findById(dto.idSala()).orElseThrow(() -> new RecursoNaoEncontradoException("Sala não encontrada"));
+        Sala sala = salaRepository.buscarPorIdComBloqueio(dto.idSala()).orElseThrow(() -> new RecursoNaoEncontradoException("Sala não encontrada"));
         if(!sala.isAtiva()) {
             throw new ValidacaoException("Sala inativa!");
         }
