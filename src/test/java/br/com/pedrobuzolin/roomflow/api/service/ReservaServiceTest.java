@@ -45,7 +45,7 @@ class ReservaServiceTest {
                 LocalDateTime.parse("2026-08-10T10:00:00"),
                 LocalDateTime.parse("2026-08-10T11:00:00"));
 
-        when(salaRepository.findById(1L)).thenReturn(Optional.of(sala));
+        when(salaRepository.buscarPorIdComBloqueio(1L)).thenReturn(Optional.of(sala));
         when(usuarioRepository.findByIdAndAtivoTrue(1L)).thenReturn(Optional.of(usuario));
 
         service.criarReserva(dto);
@@ -59,7 +59,7 @@ class ReservaServiceTest {
                 LocalDateTime.parse("2026-08-10T10:00:00"),
                 LocalDateTime.parse("2026-08-10T11:00:00"));
 
-        when(salaRepository.findById(1L)).thenReturn(Optional.empty());
+        when(salaRepository.buscarPorIdComBloqueio(1L)).thenReturn(Optional.empty());
 
         assertThrows(RecursoNaoEncontradoException.class, () -> service.criarReserva(dto));
     }
@@ -72,7 +72,7 @@ class ReservaServiceTest {
                 LocalDateTime.parse("2026-08-10T10:00:00"),
                 LocalDateTime.parse("2026-08-10T11:00:00"));
 
-        when(salaRepository.findById(1L)).thenReturn(Optional.of(salaInativa));
+        when(salaRepository.buscarPorIdComBloqueio(1L)).thenReturn(Optional.of(salaInativa));
 
         assertThrows(ValidacaoException.class, () -> service.criarReserva(dto));
     }
@@ -85,7 +85,7 @@ class ReservaServiceTest {
                 LocalDateTime.parse("2026-08-10T10:00:00"),
                 LocalDateTime.parse("2026-08-10T11:00:00"));
 
-        when(salaRepository.findById(1L)).thenReturn(Optional.of(sala));
+        when(salaRepository.buscarPorIdComBloqueio(1L)).thenReturn(Optional.of(sala));
         when(usuarioRepository.findByIdAndAtivoTrue(1L)).thenReturn(Optional.of(usuario));
         doThrow(new ValidacaoException("Sala já reservada para este horário"))
                 .when(validacaoFake).validar(dto);
